@@ -1,0 +1,225 @@
+/**
+ * 
+ */
+
+
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+
+
+
+/**
+ * @author christinerehwinkel
+ *
+ */
+public class Director {
+
+	private List<Class<?>> classList = new ArrayList<Class<?>>();
+	private ArrayList<Score> scores = new ArrayList<Score>();
+	
+	private static final String CLASS_SUFFIX = ".class";
+	Class<?> entryClass;
+	private static final String entryClassName = "Entry";
+	private static final int MAX_ROUNDS = 200;
+//	private static final String moveMethod = "getMove";
+//	private static final String setResultMethod = "setResult";
+	
+	public Director()
+	{
+		try {
+			entryClass = Class.forName(entryClassName);
+		} catch (ClassNotFoundException e) {
+			System.err.println("Could not instantiate entryClass");
+		}
+	}
+
+	private void setClassList()
+	{
+		String classpath = System.getProperty("java.class.path");
+	System.out.println("classpath is >" + classpath + "<");
+		String[] cpEntries = classpath.split(";");
+		for (int i = 0; i < cpEntries.length; i++)
+		{
+			System.out.println("Processing classpath entry " + cpEntries[i]);
+			File classPathFile = new File(cpEntries[i]);
+			if (classPathFile != null && classPathFile.exists())
+			{		// What is it?
+				if (classPathFile.isDirectory())
+				{		// Directory:  process all entries
+					processDirectory(classPathFile, cpEntries[i]);
+					
+				} else if (classPathFile.isFile())
+				{		// Normal file:  is it a .class file?
+					if (classPathFile.getName().endsWith(CLASS_SUFFIX))
+					{		// A winner
+//						checkAndAddClass(classPathFile.getName(), );
+					}
+				}
+			}
+
+		}
+	}
+	
+	private void processDirectory(File directory, String root)
+	{
+		if (directory != null && directory.exists() && directory.isDirectory())
+		{		// Qualifies
+//			System.out.println("directory.getAbsolutePath() >" + directory.getAbsolutePath() + "<");
+			String packagePathName = directory.getAbsolutePath().substring(root.length());
+//			System.out.println("\tpackagePathName is >" + packagePathName + "<");
+			if (packagePathName.startsWith("\\"))
+				packagePathName = packagePathName.substring(1);
+			String packageName = packagePathName.replace('\\', '.');
+			String[] entries = directory.list();
+				// For each entry in directory...
+			for (int i = 0; i < entries.length; i++)
+			{
+				File entry = new File(directory.getAbsolutePath() + "\\" + entries[i]);
+					// ...if it is a directory
+				if (entry.isDirectory())
+				{
+					processDirectory(entry, root);
+				} else if (entry.isFile())
+				{
+					checkAndAddClass(entry.getName(),packageName);
+				}
+			}
+		}
+	}
+	
+	private void checkAndAddClass(String fileName, String packageName)
+	{
+		String className = fileName.substring(0, fileName.lastIndexOf(CLASS_SUFFIX));
+		String 	qName;
+		if (packageName != null && !packageName.equals(""))
+			qName = packageName + "." + className;
+		else
+			qName = className;
+		try {
+			Class<?> clazz = Class.forName(qName);
+			Class<?>[] interfaces = clazz.getInterfaces();
+			for (int i = 0; i < interfaces.length; i++)
+				if (interfaces[i].equals(entryClass))
+				{
+					classList.add(clazz);
+					break;
+				}
+		} catch (ClassNotFoundException e) {
+			System.err.println("Could not instantiate " + qName);
+		}
+	}
+
+	/**
+	 * Runs the tournament for the given number of rounds.  If selfPlay is true
+	 * then each Entry will play itself (usually for testing purposes only), otherwise
+	 * each Entry will place only each other Entry for the given number of rounds.
+	 * 
+	 * @param selfPlay if true an Entry will play itself
+	 * @param numRounds the integer number of rounds each Entry plays against another entry.
+	 */
+	private void runTournament(boolean selfPlay, int numRounds) {
+		for (Class<?> entry : classList)
+		{
+			float myScore = 0;
+			try {
+				//			Class<?>[] params = {Integer.TYPE};
+				//			Method getMoveMethod = entry.getMethod(moveMethod, params);
+				//				System.out.println("First move by " + entry.getName() + " is " + newInstance.getMove(0));
+				for (Class<?> opponent : classList) {
+					float myRoundScore = 0;
+					if (opponent.getName().equals(entry.getName()) && !selfPlay) { // Don't play yourself
+						continue;
+					}
+						// Need a new instance every time
+					Entry newInstance = (Entry) entry.newInstance();
+					Entry opponentInstance = (Entry) opponent.newInstance();
+					float opponentScore = 0;
+//					System.out.println("Running " + entry.getName() +
+//							" against " + opponent.getName());
+					for (int i = 1; i <= numRounds; i++) {
+						Move myMove = newInstance.getMove(i);
+						Move opponentMove = opponentInstance.getMove(i);
+						newInstance.setResult(i, myMove, opponentMove);
+						opponentInstance.setResult(i, opponentMove, myMove);
+						myRoundScore += score(myMove, opponentMove);
+						opponentScore += score(opponentMove, myMove);
+//						System.out.println("Round " + i + ": myRoundScore " + myRoundScore +
+//								", opponentScore " + opponentScore);
+					}
+					myScore += myRoundScore;
+					System.out.println("Score: " + entry.getName() + ": " + myRoundScore
+							+ " | " + opponent.getName() + ": " + opponentScore);
+				}
+			} catch (SecurityException e) {
+				System.err.println("Could not create getMove method " + e.getMessage());
+	//		} catch (NoSuchMethodException e) {
+	//			System.err.println("Could not create getMove method " + e.getMessage());
+			} catch (IllegalArgumentException e) {
+				System.err.println("Could not create getMove method " + e.getMessage());
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				System.err.println("Could not create getMove method " + e.getMessage());
+			}
+			boolean found = false;
+			for(int i = 0; i< scores.size(); i++){
+				if(scores.get(i).getScore() > (int) myScore){
+					scores.add(i, new Score(entry.getName(), (int) myScore));
+					found = true;
+					break;
+				}
+			}
+			if(!found)
+				scores.add(new Score(entry.getName(), (int) myScore));
+		
+			System.out.println("Score for " + entry.getName() + ": " + myScore);
+		}
+		System.out.println("RESULTS\n_______");
+		for(Score result : scores)
+		{
+			System.out.println("Score for " + result.getName() + " is " + result.getScore());
+		}
+	}
+	
+	private double score(Move myMove, Move opponentMove)
+	{
+		double score;
+		if (myMove == Move.COOPERATE)
+		{
+			if (opponentMove == Move.COOPERATE)
+				score = ScoreConstant.COOPERATE_COOPERATE;
+			else
+				score = ScoreConstant.COOPERATE_DEFECT;
+		} else
+			if (opponentMove == Move.COOPERATE)
+				score = ScoreConstant.DEFECT_COOPERATE;
+			else
+				score = ScoreConstant.DEFECT_DEFECT;
+		return score;
+	}
+	public void printClassList()
+	{
+		for (Class<?> clazz : classList)
+		{
+			System.out.println(clazz.getCanonicalName());
+		}
+	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Director director = new Director();
+		director.setClassList();
+//		director.printClassList();
+		director.runTournament(true, MAX_ROUNDS);
+		
+	}
+
+
+
+}

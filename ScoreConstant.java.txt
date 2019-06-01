@@ -1,0 +1,7 @@
+public class ScoreConstant {
+
+	public static final double COOPERATE_COOPERATE = 3;
+	public static final double COOPERATE_DEFECT = 0;
+	public static final double DEFECT_COOPERATE = 5;
+	public static final double DEFECT_DEFECT = 1;
+}

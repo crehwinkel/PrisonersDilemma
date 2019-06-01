@@ -1,0 +1,19 @@
+public class Jesus implements Entry {
+	/* (non-Javadoc)
+	 * @see tournament.entries.Entry#getMove(int)
+	 */
+	@Override
+	public Move getMove(int round) {
+		return Move.COOPERATE;
+	}
+	/* (non-Javadoc)
+	 * @see tournament.entries.Entry#setResult(int, tournament.util.Move,
+tournament.util.Move)
+	 */
+	@Override
+	public void setResult(int round, Move yourMove, Move opponentMove)
+	{
+		
+	}
+	
+}

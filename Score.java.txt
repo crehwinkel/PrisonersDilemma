@@ -1,0 +1,27 @@
+
+public class Score {
+
+	
+	private String name;
+	private int score;
+
+	public Score(String name, int total){
+		this.name = name;
+		this.score = total;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the score
+	 */
+	public int getScore() {
+		return score;
+	}
+	
+}

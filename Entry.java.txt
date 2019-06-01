@@ -1,0 +1,20 @@
+public interface Entry {
+
+	/**
+	 * Returns this entry's move for the given round.
+	 * @param round the integer round number
+	 * @return the Move made for this round by this entry
+	 */
+	public Move getMove(int round);
+
+
+
+	/**
+	 * Sets the moves made for the given round by this entry and the opponent.
+	 * 
+	 * @param round the integer round number
+	 * @param yourMove the Move this entry  made for this round
+	 * @param opponentMove the Move the opponent made for this round
+	 */
+	public void setResult(int round, Move yourMove, Move opponentMove);
+}
