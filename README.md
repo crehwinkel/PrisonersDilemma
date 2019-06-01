@@ -1,6 +1,8 @@
 # PrisonersDilemma
 Directions and code to play Prisoners Dilemma
 
+In class we listen to the first 10 minutes of the radiolab mp3 which sets up the motivation for this game and how it is played.
+
 Prisoners Dilemma is a standard example of a game analyzed in game theory
  
   From https://en.wikipedia.org/wiki/Prisoner%27s_dilemma
@@ -18,10 +20,14 @@ The Director code which runs this tournament was modeled after Robert Axelrod's 
 
 Here is the scoring for YOUR program versus the other team's program:
 
-   public static final double COOPERATE_COOPERATE = 3;
- 	 public static final double COOPERATE_DEFECT = 0;
-	 public static final double DEFECT_COOPERATE = 5;
-	 public static final double DEFECT_DEFECT = 1;
+public class ScoreConstant {
+
+	public static final double COOPERATE_COOPERATE = 3;
+	public static final double COOPERATE_DEFECT = 0;
+	public static final double DEFECT_COOPERATE = 5;
+	public static final double DEFECT_DEFECT = 1;
+}
+
    
    For example if you cooperate when the other team defects you earn 0 points. If you defect when the other team cooperates you get 5 points. If both teams defect, they each earn 1 point. If both teams cooperate, they each earn 3 points.
    
