@@ -1,6 +1,11 @@
 # PrisonersDilemma
 Directions and code to play Prisoners Dilemma
 
+Central Question in Prisoners Dilemma - 
+When playing against opponent (co-worker/business/country) do you try to help them or not.
+
+               Prisoners Dilemma has applications in Cold War, economy, social sciences ...
+
 In class we listen to the first 10 minutes of the radiolab mp3 which sets up the motivation for this game and how it is played.
 
 Prisoners Dilemma is a standard example of a game analyzed in game theory
